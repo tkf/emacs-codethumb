@@ -161,8 +161,9 @@ later when it is needed."
       (setq codethumb:draw--d
             (deferred:try
               (deferred:$
-                (epc:call-deferred (codethumb:get-epc) 'make_thumb
-                                   (list code line-min line-max))
+                (epc:call-deferred
+                 (codethumb:get-epc) 'make_thumb
+                 (list code buffer-file-name line-min line-max))
                 (deferred:nextc it #'base64-decode-string)
                 (deferred:nextc it
                   (lambda (data) (create-image data 'png t)))

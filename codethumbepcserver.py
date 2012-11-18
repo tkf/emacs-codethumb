@@ -1,7 +1,7 @@
 import base64
 
 from pygments import highlight
-from pygments.lexers import PythonLexer
+from pygments import lexers
 from pygments.formatters import ImageFormatter
 
 
@@ -14,10 +14,14 @@ class CodeThumb(object):
     def set_font_name(self, name):
         self.font_name = name
 
-    def make_thumb(self, code, hl_line_min, hl_line_max):
+    def make_thumb(self, code, filename, hl_line_min, hl_line_max):
+        if filename:
+            lx = lexers.guess_lexer_for_filename(filename, code)
+        else:
+            lx = lexers.guess_lexer(code)
         png = highlight(
             code,
-            PythonLexer(),
+            lx,
             ImageFormatter(style=self.style,
                            line_numbers=False,
                            hl_lines=range(hl_line_min, hl_line_max + 1),
