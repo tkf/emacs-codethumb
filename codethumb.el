@@ -152,11 +152,12 @@ later when it is needed."
       (deferred:nextc it
         (lambda (png)
           (with-current-buffer (get-buffer-create codethumb:buffer)
-            (erase-buffer)
-            (insert-image png)
-            ;; avoid surrounding image with cursor color
-            (set-window-point (get-buffer-window (current-buffer))
-                              (point))))))))
+            (let ((window (get-buffer-window (current-buffer))))
+              (when window
+                (erase-buffer)
+                (insert-image png)
+                ;; avoid surrounding image with cursor color
+                (set-window-point window (point))))))))))
 
 (defun codethumb:draw ()
   (when (codethumb:draw-p)
