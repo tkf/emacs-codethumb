@@ -91,6 +91,10 @@ following command::
     python codethumbepcserver.py --help"
   :group 'codethumb)
 
+(defcustom codethumb:draw-delay 0.01
+  "Seconds to wait before start drawing code thumbnail."
+  :group 'codethumb)
+
 
 ;;; Server management
 
@@ -146,6 +150,27 @@ later when it is needed."
           (with-current-buffer (get-buffer-create codethumb:buffer)
             (erase-buffer)
             (insert-image png)))))))
+
+(defun codethumb:show ()
+  (interactive)
+  (let ((buffer (get-buffer-create codethumb:buffer)))
+    (display-buffer buffer)
+    (with-current-buffer buffer
+      (insert "Drawing thumbnail..."))
+    (codethumb:start-timer)
+    (codethumb:draw)))
+
+(defvar codethumb:idle-timer nil)
+
+(defun codethumb:start-timer ()
+  (interactive)
+  (setq codethumb:idle-timer
+        (run-with-idle-timer codethumb:draw-delay t #'codethumb:draw)))
+
+(defun codethumb:stop-timer ()
+  (interactive)
+  (cancel-timer codethumb:idle-timer)
+  (setq codethumb:idle-timer nil))
 
 (provide 'codethumb)
 
