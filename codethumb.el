@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'epc)
 
 
@@ -143,35 +144,44 @@ later when it is needed."
 (defvar codethumb:draw--d nil)
 
 (defun codethumb:draw-1 ()
-  (let ((point-min (point-min))
-        line-min
-        line-max)
-    (save-excursion
-      (move-to-window-line 0)
-      (setq line-min (count-lines point-min (point)))
-      (move-to-window-line -1)
-      (setq line-max (count-lines point-min (point))))
-    (when codethumb:draw--d
-      (deferred:cancel codethumb:draw--d))
-    (setq
-     codethumb:draw--d
-     (deferred:$
-       (epc:call-deferred
-        (codethumb:get-epc) 'make_thumb
-        (list (buffer-substring-no-properties (point-min) (point-max))
-              (1+ line-min) (1+ line-max)))
-       (deferred:nextc it #'base64-decode-string)
-       (deferred:nextc it
-         (lambda (data) (create-image data 'png t)))
-       (deferred:nextc it
-         (lambda (png)
-           (with-current-buffer (get-buffer-create codethumb:buffer)
-             (let ((window (get-buffer-window (current-buffer))))
-               (when window
-                 (erase-buffer)
-                 (insert-image png)
-                 ;; avoid surrounding image with cursor color
-                 (set-window-point window (point)))))))))))
+  (when (and
+         ;; drawing job is not running, and
+         (not codethumb:draw--d)
+         ;; buffer is visible.
+         (get-buffer-window (get-buffer-create codethumb:buffer)))
+    (let ((point-min (point-min))
+          (code (buffer-substring-no-properties (point-min) (point-max)))
+          line-min
+          line-max)
+      (save-excursion
+        (move-to-window-line 0)
+        (setq line-min (1+ (count-lines point-min (point))))
+        (move-to-window-line -1)
+        (setq line-max (1+ (count-lines point-min (point)))))
+      (setq codethumb:draw--d
+            (deferred:try
+              (deferred:$
+                (epc:call-deferred (codethumb:get-epc) 'make_thumb
+                                   (list code line-min line-max))
+                (deferred:nextc it #'base64-decode-string)
+                (deferred:nextc it
+                  (lambda (data) (create-image data 'png t)))
+                (deferred:nextc it
+                  (lambda (png)
+                    (with-current-buffer (get-buffer-create codethumb:buffer)
+                      (let ((window (get-buffer-window (current-buffer))))
+                        (when window
+                          (erase-buffer)
+                          (insert-image png)
+                          ;; avoid surrounding image with cursor color
+                          (set-window-point window (point))))))))
+              :finally
+              (lexical-let ((last-point (point)))
+                (lambda ()
+                  (setq codethumb:draw--d nil)
+                  (unless (= (point) last-point)
+                    ;; refresh when the point is moved.
+                    (codethumb:draw-1)))))))))
 
 (defun codethumb:draw ()
   (when (codethumb:draw-p)
