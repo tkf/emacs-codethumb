@@ -149,7 +149,10 @@ later when it is needed."
         (lambda (png)
           (with-current-buffer (get-buffer-create codethumb:buffer)
             (erase-buffer)
-            (insert-image png)))))))
+            (insert-image png)
+            ;; avoid surrounding image with cursor color
+            (set-window-point (get-buffer-window (current-buffer))
+                              (point))))))))
 
 (defun codethumb:show ()
   (interactive)
