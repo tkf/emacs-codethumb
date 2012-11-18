@@ -173,6 +173,7 @@ later when it is needed."
   "Decide if thumbnail should be drawn for the current buffer."
   (apply #'derived-mode-p codethumb:modes))
 
+;;;###autoload
 (defun codethumb:show ()
   (interactive)
   (let ((buffer (get-buffer-create codethumb:buffer)))
@@ -193,6 +194,11 @@ later when it is needed."
   (interactive)
   (cancel-timer codethumb:idle-timer)
   (setq codethumb:idle-timer nil))
+
+;;;###autoload
+(defun codethumb:stop ()
+  (interactive)
+  (codethumb:stop-timer))
 
 (provide 'codethumb)
 
