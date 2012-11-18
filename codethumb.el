@@ -189,7 +189,7 @@ later when it is needed."
                   (setq codethumb:draw--d nil)
                   (unless (= (point) last-point)
                     ;; refresh when the point is moved.
-                    (codethumb:draw-1)))))))))
+                    (codethumb:draw)))))))))
 
 (defun codethumb:draw ()
   (when (codethumb:draw-p)
