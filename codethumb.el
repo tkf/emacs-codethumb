@@ -95,7 +95,7 @@ following command::
   "Modes to draw thumbnail."
   :group 'codethumb)
 
-(defcustom codethumb:draw-delay 0.01
+(defcustom codethumb:draw-delay 0.1
   "Seconds to wait before start drawing code thumbnail."
   :group 'codethumb)
 
