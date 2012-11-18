@@ -1,8 +1,22 @@
 import base64
+import io
 
+from PIL import Image
 from pygments import highlight
 from pygments import lexers
 from pygments.formatters import ImageFormatter
+
+
+def crop_image(png, center_pos_ratio, height_px):
+    im = Image.open(io.BytesIO(png))
+    (im_w, im_h) = im.size
+    center_px = im_h * center_pos_ratio
+    lower = min(center_px + height_px / 2, im_h)
+    upper = max(lower - height_px, 0)
+    box = [0, int(upper), im_w, int(lower)]
+    out = io.BytesIO()
+    im.crop(box).save(out, 'PNG')
+    return out.getvalue()
 
 
 class CodeThumb(object):
@@ -14,7 +28,8 @@ class CodeThumb(object):
     def set_font_name(self, name):
         self.font_name = name
 
-    def make_thumb(self, code, filename, hl_line_min, hl_line_max):
+    def make_thumb(self, code, filename, hl_line_min, hl_line_max,
+                   height_px):
         if filename:
             lx = lexers.guess_lexer_for_filename(filename, code)
         else:
@@ -28,7 +43,11 @@ class CodeThumb(object):
                            font_size=3,
                            font_name=self.font_name))
 
-        return base64.encodestring(png)
+        lines = sum(1 for _ in code.splitlines())
+        center_pos_ratio = ((hl_line_max - hl_line_min) / 2.0) / lines
+        cropped = crop_image(png, center_pos_ratio, height_px)
+
+        return base64.encodestring(cropped)
 
 
 def codethumb_epc_server(address, port):

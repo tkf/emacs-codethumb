@@ -144,15 +144,17 @@ later when it is needed."
 (defvar codethumb:draw--d nil)
 
 (defun codethumb:draw-1 ()
-  (when (and
-         ;; drawing job is not running, and
-         (not codethumb:draw--d)
-         ;; buffer is visible.
-         (get-buffer-window (get-buffer-create codethumb:buffer)))
-    (let ((point-min (point-min))
-          (code (buffer-substring-no-properties (point-min) (point-max)))
-          line-min
-          line-max)
+  (let* ((point-min (point-min))
+         (code (buffer-substring-no-properties point-min (point-max)))
+         line-min
+         line-max
+         window)
+    (when (and
+           ;; drawing job is not running, and
+           (not codethumb:draw--d)
+           ;; buffer is visible.
+           (setq window
+                 (get-buffer-window (get-buffer-create codethumb:buffer))))
       (save-excursion
         (move-to-window-line 0)
         (setq line-min (1+ (count-lines point-min (point))))
@@ -163,7 +165,12 @@ later when it is needed."
               (deferred:$
                 (epc:call-deferred
                  (codethumb:get-epc) 'make_thumb
-                 (list code buffer-file-name line-min line-max))
+                 (let ((height-px
+                        (destructuring-bind (left top right bottom)
+                            (window-pixel-edges window)
+                          (- bottom top))))
+                   (list code buffer-file-name line-min line-max
+                         height-px)))
                 (deferred:nextc it #'base64-decode-string)
                 (deferred:nextc it
                   (lambda (data) (create-image data 'png t)))
@@ -198,6 +205,7 @@ later when it is needed."
   (let ((buffer (get-buffer-create codethumb:buffer)))
     (display-buffer buffer)
     (with-current-buffer buffer
+      (erase-buffer)
       (insert "Drawing thumbnail..."))
     (codethumb:start-timer)
     (codethumb:draw)))
