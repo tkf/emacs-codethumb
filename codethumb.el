@@ -215,6 +215,7 @@ later when it is needed."
 ;;;###autoload
 (defun codethumb:start-timer ()
   (interactive)
+  (get-buffer-create codethumb:buffer)
   (unless codethumb:idle-timer
     (setq codethumb:idle-timer
           (run-with-idle-timer codethumb:draw-delay t #'codethumb:draw))))
