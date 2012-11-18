@@ -44,7 +44,7 @@ class CodeThumb(object):
                            font_name=self.font_name))
 
         lines = sum(1 for _ in code.splitlines())
-        center_pos_ratio = ((hl_line_max - hl_line_min) / 2.0) / lines
+        center_pos_ratio = ((hl_line_max + hl_line_min) / 2.0) / lines
         cropped = crop_image(png, center_pos_ratio, height_px)
 
         return base64.encodestring(cropped)
