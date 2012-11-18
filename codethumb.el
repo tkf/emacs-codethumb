@@ -91,6 +91,10 @@ following command::
     python codethumbepcserver.py --help"
   :group 'codethumb)
 
+(defcustom codethumb:modes '(prog-mode)
+  "Modes to draw thumbnail."
+  :group 'codethumb)
+
 (defcustom codethumb:draw-delay 0.01
   "Seconds to wait before start drawing code thumbnail."
   :group 'codethumb)
@@ -128,7 +132,7 @@ later when it is needed."
 
 ;;; Main
 
-(defun codethumb:draw ()
+(defun codethumb:draw-1 ()
   (let ((point-min (point-min))
         line-min
         line-max)
@@ -153,6 +157,14 @@ later when it is needed."
             ;; avoid surrounding image with cursor color
             (set-window-point (get-buffer-window (current-buffer))
                               (point))))))))
+
+(defun codethumb:draw ()
+  (when (codethumb:draw-p)
+    (codethumb:draw-1)))
+
+(defun codethumb:draw-p ()
+  "Decide if thumbnail should be drawn for the current buffer."
+  (apply #'derived-mode-p codethumb:modes))
 
 (defun codethumb:show ()
   (interactive)
