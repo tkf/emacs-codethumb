@@ -212,11 +212,14 @@ later when it is needed."
 
 (defvar codethumb:idle-timer nil)
 
+;;;###autoload
 (defun codethumb:start-timer ()
   (interactive)
-  (setq codethumb:idle-timer
-        (run-with-idle-timer codethumb:draw-delay t #'codethumb:draw)))
+  (unless codethumb:idle-timer
+    (setq codethumb:idle-timer
+          (run-with-idle-timer codethumb:draw-delay t #'codethumb:draw))))
 
+;;;###autoload
 (defun codethumb:stop-timer ()
   (interactive)
   (cancel-timer codethumb:idle-timer)
