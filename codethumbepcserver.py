@@ -8,8 +8,11 @@ from pygments.formatters import ImageFormatter
 class CodeThumb(object):
 
     def __init__(self):
-        self.font_name = 'VL Gothic'
+        self.font_name = None
         self.style = 'monokai'
+
+    def set_font_name(self, name):
+        self.font_name = name
 
     def make_thumb(self, code, hl_line_min, hl_line_max):
         png = highlight(
@@ -29,6 +32,7 @@ def codethumb_epc_server(address, port):
     codethumb = CodeThumb()
     server = epc.server.EPCServer((address, port))
     server.register_function(codethumb.make_thumb)
+    server.register_function(codethumb.set_font_name)
     server.print_port()
     server.serve_forever()
 

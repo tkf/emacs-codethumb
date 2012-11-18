@@ -99,6 +99,11 @@ following command::
   "Seconds to wait before start drawing code thumbnail."
   :group 'codethumb)
 
+(defcustom codethumb:font-name nil
+  "Font name.
+Run the program ``fc-list`` to see usable font names."
+  :group 'codethumb)
+
 
 ;;; Server management
 
@@ -113,6 +118,9 @@ following command::
      (epc:connection-process (epc:manager-connection codethumb:epc)) nil)
     (set-process-query-on-exit-flag
      (epc:manager-server-process codethumb:epc) nil))
+  (when codethumb:font-name
+    (epc:call-deferred codethumb:epc 'set_font_name
+                       (list codethumb:font-name)))
   codethumb:epc)
 
 (defun codethumb:stop-server ()
