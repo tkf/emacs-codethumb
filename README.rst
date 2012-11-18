@@ -21,3 +21,9 @@ Requirements
 
   - Python-EPC
   - pygments
+
+
+Usage
+-----
+
+``M-x codethumb:show``
