@@ -13,6 +13,8 @@ def crop_image(png, center_pos_ratio, height_px):
     center_px = im_h * center_pos_ratio
     lower = min(center_px + height_px / 2, im_h)
     upper = max(lower - height_px, 0)
+    if upper == 0:
+        lower = min(upper + height_px, im_h)
     box = [0, int(upper), im_w, int(lower)]
     out = io.BytesIO()
     im.crop(box).save(out, 'PNG')
