@@ -21,6 +21,7 @@ Requirements
 
   - Python-EPC
   - pygments
+  - PIL
 
 
 Usage
