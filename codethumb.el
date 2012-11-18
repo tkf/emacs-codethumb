@@ -216,7 +216,8 @@ later when it is needed."
 ;;;###autoload
 (defun codethumb:stop ()
   (interactive)
-  (codethumb:stop-timer))
+  (codethumb:stop-timer)
+  (codethumb:stop-server))
 
 (provide 'codethumb)
 
