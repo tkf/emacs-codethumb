@@ -182,7 +182,7 @@ later when it is needed."
                           (erase-buffer)
                           (insert-image png)
                           ;; avoid surrounding image with cursor color
-                          (set-window-point window (point))))))))
+                          (setq cursor-type nil)))))))
               :finally
               (lexical-let ((last-point (point)))
                 (lambda ()
