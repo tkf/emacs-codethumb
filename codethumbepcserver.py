@@ -40,7 +40,9 @@ class CodeThumb(object):
             code,
             lx,
             ImageFormatter(style=self.style,
+                           line_pad=0,  # default: 2
                            line_numbers=False,
+                           image_pad=5,  # default: 10
                            hl_lines=range(hl_line_min, hl_line_max + 1),
                            font_size=3,
                            font_name=self.font_name))
